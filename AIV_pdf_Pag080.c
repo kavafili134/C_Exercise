@@ -12,6 +12,9 @@
 /*
 ● They are unique sets with a value
 ● Implement them over the set structures to support any kind of value
+● Higher Level Exercise: keep count of how many collisions are in the hash
+    map and increase the size of the hash table when there is too much
+    ‘pressure’ (note: it requires rehashing of the whole dictionary)
 */
 
 int hashmap_size = 10;
@@ -92,17 +95,6 @@ int set_search_and_return(struct set_table *table, const char *key, const size_t
     return 0; // se non trovo la chiave ritorno 0
 }
 
-int re_hash(struct set_table *table) // funzione ReHash
-{
-    hashmap_size++;
-    for(int i = 0; i > table->size; i++)
-    {
-        size_t hash = djb33x_hash(table->nodes[i]->key, hashmap_size); // calcolo la chiave hash
-    }
-
-    return 0;
-}
-
 struct set_node *set_insert(struct set_table *table, const char *key, const size_t key_len, const int Value) // inserisce un elemento nella tabella
 {
     size_t hash = djb33x_hash(key, key_len); // calcola l'hash della chiave
@@ -111,14 +103,7 @@ struct set_node *set_insert(struct set_table *table, const char *key, const size
 
     if(set_search(table, key, hashmap_size) != NULL) // se la chiave è già presente nella tabella
     {
-        if(set_search(table, key, hashmap_size)->key == key) // se la chiave è già presente nella tabella
-        {
-            re_hash(table); // rialloco la tabella
-        }
-        else
-        {
-            return NULL; // ritorna nullo
-        }
+        return NULL; // ritorna NULL
     }
 
     if (!head) // se il nodo iniziale non esiste
@@ -192,6 +177,7 @@ int main()
     struct set_table *table = set_table_new(hashmap_size);
     set_insert(table, "Hello", hashmap_size, 82);
     set_insert(table, "World", hashmap_size, 12);
+    set_insert(table, "Hello", hashmap_size, 82);
     set_insert(table, "Ciao in Italiano", hashmap_size, 10);
     set_insert(table, "Mondo in Italiano", hashmap_size, 20);
     set_insert(table, "Sorry", hashmap_size, 22);
